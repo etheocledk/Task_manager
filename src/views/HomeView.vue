@@ -20,96 +20,104 @@
           <AddTaskModal @newTask="handleNewTask"></AddTaskModal>
         </div>
       </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="">
-            <div class="table-responsive">
-              <table class="table project-list-table table-nowrap align-middle table-borderless">
-                <thead>
-                  <tr>
-                    <th class="ps-4" scope="col">Date</th>
-                    <th scope="col">Titre</th>
-                    <th scope="col">Priorité</th>
-                    <th scope="col">Statut</th>
-                    <th scope="col" style="width: 200px;">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in paginatedTasks" :key="item.id">
-                    <td class="ps-4">{{ moment(item.created_at).format("DD/MM/YYYY HH:mm:ss") }}</td>
-                    <td>{{ item.title }}</td>
-                    <td>
-                      <span :class="{
-                        'badge': true,
-                        'badge-soft-danger': item.priority === 'high',
-                        'badge-soft-warning': item.priority === 'medium',
-                        'badge-soft-success': item.priority === 'low'
-                      }" class="mb-0">
-                        {{ item.priority === 'high' ? 'Élevé' : item.priority === 'medium' ? 'Moyen' : 'Bas' }}
-                      </span>
-                    </td>
-                    <td>{{ formatStatus(item.status) }} </td>
-                    <td>
-                      <ul class="list-inline mb-0">
-                        <li class="list-inline-item">
-                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Modifier"
-                            @click="openUpdateModal(item.id)" class="px-2 text-primary"><i
-                              class="bx bx-pencil font-size-18"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="remove(item.id)"
-                            title="Supprimer" class="px-2 text-danger"><i class="bx bx-trash-alt font-size-18"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="openDetailModal(item.id)"
-                            title="Detail" class="px-2 text-danger"> <i class="bx bx-detail font-size-18 me-2"
-                              style="color: #17a2b8;"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="openAssignModal(item.id)"
-                            title="Assigner" class="px-2 text-danger"><i class="bx bx-user-plus font-size-18 me-2"
-                              style="color: #28a745;"></i>
-                          </a>
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+
+      <div v-if="paginatedTasks.length != 0">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="">
+              <div class="table-responsive">
+                <table class="table project-list-table table-nowrap align-middle table-borderless">
+                  <thead>
+                    <tr>
+                      <th class="ps-4" scope="col">Date</th>
+                      <th scope="col">Titre</th>
+                      <th scope="col">Priorité</th>
+                      <th scope="col">Statut</th>
+                      <th scope="col" style="width: 200px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in paginatedTasks" :key="item.id">
+                      <td class="ps-4">{{ moment(item.created_at).format("DD/MM/YYYY HH:mm:ss") }}</td>
+                      <td>{{ item.title }}</td>
+                      <td>
+                        <span :class="{
+                          'badge': true,
+                          'badge-soft-danger': item.priority === 'high',
+                          'badge-soft-warning': item.priority === 'medium',
+                          'badge-soft-success': item.priority === 'low'
+                        }" class="mb-0">
+                          {{ item.priority === 'high' ? 'Élevé' : item.priority === 'medium' ? 'Moyen' : 'Bas' }}
+                        </span>
+                      </td>
+                      <td>{{ formatStatus(item.status) }} </td>
+                      <td>
+                        <ul class="list-inline mb-0">
+                          <li class="list-inline-item">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Modifier"
+                              @click="openUpdateModal(item.id)" class="px-2 text-primary"><i
+                                class="bx bx-pencil font-size-18"></i></a>
+                          </li>
+                          <li class="list-inline-item">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="remove(item.id)"
+                              title="Supprimer" class="px-2 text-danger"><i
+                                class="bx bx-trash-alt font-size-18"></i></a>
+                          </li>
+                          <li class="list-inline-item">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top"
+                              @click="openDetailModal(item.id)" title="Detail" class="px-2 text-danger"> <i
+                                class="bx bx-detail font-size-18 me-2" style="color: #17a2b8;"></i></a>
+                          </li>
+                          <li class="list-inline-item">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top"
+                              @click="openAssignModal(item.id)" title="Assigner" class="px-2 text-danger"><i
+                                class="bx bx-user-plus font-size-18 me-2" style="color: #28a745;"></i>
+                            </a>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
+        <div class="row g-0 align-items-center pb-4">
+          <div class="col-sm-6">
+            <div>
+              <p class="mb-sm-0">Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage *
+                itemsPerPage, totalTasks) }} of {{ totalTasks }} entries</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-sm-end">
+              <ul class="pagination mb-sm-0">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <a href="#" @click.prevent="changePage(currentPage - 1)" class="page-link"><i
+                      class="mdi mdi-chevron-left"></i></a>
+                </li>
+                <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: page === currentPage }">
+                  <a href="#" @click.prevent="changePage(page)" class="page-link">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                  <a href="#" @click.prevent="changePage(currentPage + 1)" class="page-link"><i
+                      class="mdi mdi-chevron-right"></i></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <TaskDetail :showOffcanvas="showOffcanvas" :taskChooseId="taskChooseId" @showOffcanvas="getShowOffcanvasStatus">
+        </TaskDetail>
+        <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask="updateTaskRow"></UpdateTaskModal>
+        <TaskAssigner :mode="modeAssignModal" :taskChooseId="taskChooseId"></TaskAssigner>
       </div>
-      <div class="row g-0 align-items-center pb-4">
-        <div class="col-sm-6">
-          <div>
-            <p class="mb-sm-0">Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage *
-              itemsPerPage, totalTasks) }} of {{ totalTasks }} entries</p>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-sm-end">
-            <ul class="pagination mb-sm-0">
-              <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                <a href="#" @click.prevent="changePage(currentPage - 1)" class="page-link"><i
-                    class="mdi mdi-chevron-left"></i></a>
-              </li>
-              <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: page === currentPage }">
-                <a href="#" @click.prevent="changePage(page)" class="page-link">{{ page }}</a>
-              </li>
-              <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                <a href="#" @click.prevent="changePage(currentPage + 1)" class="page-link"><i
-                    class="mdi mdi-chevron-right"></i></a>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div v-else class="d-flex justify-content-center align-items-center w-100 h-100 mt-5">
+        <NoData></NoData>
+        <h2 class="text-color-text fs-6">Aucune donnée disponible</h2>
       </div>
     </div>
-    <TaskDetail :showOffcanvas="showOffcanvas" :taskChooseId="taskChooseId" @showOffcanvas="getShowOffcanvasStatus">
-    </TaskDetail>
-    <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask="updateTaskRow"></UpdateTaskModal>
-    <TaskAssigner :mode="modeAssignModal" :taskChooseId="taskChooseId"></TaskAssigner>
   </div>
 </template>
 <script setup>
@@ -118,6 +126,7 @@ import AddTaskModal from "@/components/AddTaskModal.vue";
 import TaskDetail from "@/components/TaskDetail.vue";
 import UpdateTaskModal from "@/components/UpdateTaskModal.vue";
 import TaskAssigner from "@/components/TaskAssigner.vue";
+import NoData from "@/components/icons/NoData.vue";
 import { useTasks } from "../composables/tasks";
 import { useSwal } from "../composables/swal";
 import moment from "moment";
@@ -177,16 +186,16 @@ const remove = async (id) => {
 }
 
 const formatStatus = (status) => {
-    switch (status) {
-        case 'to_do':
-            return 'A faire';
-        case 'in_progress':
-            return 'En cours';
-        case 'completed':
-            return 'Terminé';
-        default:
-            return 'Non défini';
-    }
+  switch (status) {
+    case 'to_do':
+      return 'A faire';
+    case 'in_progress':
+      return 'En cours';
+    case 'completed':
+      return 'Terminé';
+    default:
+      return 'Non défini';
+  }
 };
 
 // Fonction pour gérer l'ajout d'une nouvelle tâche
