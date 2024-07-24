@@ -36,8 +36,8 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { Modal } from 'bootstrap';
-import { useTasks } from "../composables/tasks";
-import { useSwal } from "../composables/swal";
+import { useTasks } from "@/composables/tasks";
+import { useSwal } from "@/composables/swal";
 const { assignTask } = useTasks();
 const props = defineProps(["mode", "taskChooseId"]);
 

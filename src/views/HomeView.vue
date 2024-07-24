@@ -121,14 +121,14 @@
   </div>
 </template>
 <script setup>
-import HeaderVue from "../components/Header.vue";
+import HeaderVue from "@/components/Header.vue";
 import AddTaskModal from "@/components/AddTaskModal.vue";
 import TaskDetail from "@/components/TaskDetail.vue";
 import UpdateTaskModal from "@/components/UpdateTaskModal.vue";
 import TaskAssigner from "@/components/TaskAssigner.vue";
 import NoData from "@/components/icons/NoData.vue";
-import { useTasks } from "../composables/tasks";
-import { useSwal } from "../composables/swal";
+import { useTasks } from "@/composables/tasks";
+import { useSwal } from "@/composables/swal";
 import moment from "moment";
 import { ref, onMounted, computed } from "vue";
 

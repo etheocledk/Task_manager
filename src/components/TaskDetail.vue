@@ -42,7 +42,7 @@
 </template>
 <script setup>
 import { ref, watch } from "vue";
-import { useTasks } from "../composables/tasks";
+import { useTasks } from "@/composables/tasks";
 import moment from 'moment';
 const props = defineProps(["showOffcanvas", "taskChooseId"]);
 const emits = defineEmits(["showOffcanvas"]);
