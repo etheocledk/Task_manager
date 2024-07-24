@@ -89,11 +89,14 @@ export const useTasks = () => {
     };
 
 
-    const updateTask = async (id, updatedFields) => {
+    const updateTask = async (id, data) => {
         const { data: updatedTask, error: updateError } = await supabase
             .from('tasks')
             .update({
-                ...updatedFields,
+                title: data.value.title,
+                description: data.value.description,
+                priority: data.value.priority,
+                status: data.value.status,
                 updated_at: new Date()
             })
             .eq('id', id)

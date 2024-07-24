@@ -11,7 +11,7 @@
         <div class="col-md-6">
           <div class="mb-3">
             <h5 class="card-title">
-              Liste des tâches 
+              Liste des tâches
               <span class="text-muted fw-normal ms-2">({{ totalTasks }})</span>
             </h5>
           </div>
@@ -48,12 +48,13 @@
                         {{ item.priority === 'high' ? 'Élevé' : item.priority === 'medium' ? 'Moyen' : 'Bas' }}
                       </span>
                     </td>
-                    <td>{{ item.statut || 'undefined' }}</td>
+                    <td>{{ item.status || 'undefined' }}</td>
                     <td>
                       <ul class="list-inline mb-0">
                         <li class="list-inline-item">
                           <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Modifier"
-                            class="px-2 text-primary"><i class="bx bx-pencil font-size-18"></i></a>
+                            @click="openUpdateModal(item.id)" class="px-2 text-primary"><i
+                              class="bx bx-pencil font-size-18"></i></a>
                         </li>
                         <li class="list-inline-item">
                           <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="remove(item.id)"
@@ -61,8 +62,12 @@
                         </li>
                         <li class="list-inline-item dropdown">
                           <a class="text-muted dropdown-toggle font-size-18 px-2" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-haspopup="true"><i
+                            data-bs-toggle="dropdown" aria-expanded="false"><i
                               class="bx bx-dots-vertical-rounded"></i></a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" @click="openDetailModal(item.id)">Détails</a></li>
+                            <li><a class="dropdown-item" href="#">Assigner</a></li>
+                          </ul>
                         </li>
                       </ul>
                     </td>
@@ -76,31 +81,40 @@
       <div class="row g-0 align-items-center pb-4">
         <div class="col-sm-6">
           <div>
-            <p class="mb-sm-0">Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, totalTasks) }} of {{ totalTasks }} entries</p>
+            <p class="mb-sm-0">Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage *
+              itemsPerPage, totalTasks) }} of {{ totalTasks }} entries</p>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="float-sm-end">
             <ul class="pagination mb-sm-0">
               <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                <a href="#" @click.prevent="changePage(currentPage - 1)" class="page-link"><i class="mdi mdi-chevron-left"></i></a>
+                <a href="#" @click.prevent="changePage(currentPage - 1)" class="page-link"><i
+                    class="mdi mdi-chevron-left"></i></a>
               </li>
               <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: page === currentPage }">
                 <a href="#" @click.prevent="changePage(page)" class="page-link">{{ page }}</a>
               </li>
               <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                <a href="#" @click.prevent="changePage(currentPage + 1)" class="page-link"><i class="mdi mdi-chevron-right"></i></a>
+                <a href="#" @click.prevent="changePage(currentPage + 1)" class="page-link"><i
+                    class="mdi mdi-chevron-right"></i></a>
               </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
+    <TaskDetail :showOffcanvas="showOffcanvas" :taskChooseId="taskChooseId" @showOffcanvas="getShowOffcanvasStatus">
+    </TaskDetail>
+    <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask = "updateTaskRow"></UpdateTaskModal >
+
   </div>
 </template>
 <script setup>
 import HeaderVue from "../components/Header.vue";
 import AddTaskModal from "@/components/AddTaskModal.vue";
+import TaskDetail from "@/components/TaskDetail.vue";
+import UpdateTaskModal from "@/components/UpdateTaskModal.vue";
 import { useTasks } from "../composables/tasks";
 import { useSwal } from "../composables/swal";
 import moment from "moment";
@@ -111,6 +125,9 @@ const isLoading = ref(false);
 const tasksList = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const showOffcanvas = ref(false);
+const taskChooseId = ref();
+const mode = ref(false);
 
 // Nombre total de tâches
 const totalTasks = computed(() => tasksList.value.length);
@@ -165,4 +182,28 @@ const changePage = (page) => {
   if (page < 1 || page > totalPages.value) return;
   currentPage.value = page;
 };
+
+async function getShowOffcanvasStatus(value) {
+  showOffcanvas.value = value;
+}
+
+async function openDetailModal(id) {
+  showOffcanvas.value = true;
+  taskChooseId.value = id;
+}
+
+async function openUpdateModal(id) {
+  mode.value = true;
+  taskChooseId.value = id;
+}
+
+async function updateTaskRow(value) {
+  const updatedTask = value[0];
+  const index = tasksList.value.findIndex(task => task.id === updatedTask.id);
+  if (index !== -1) {
+    tasksList.value.splice(index, 1);
+  }
+  tasksList.value.unshift(updatedTask);
+}
+
 </script>
