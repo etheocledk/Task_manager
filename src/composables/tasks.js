@@ -1,5 +1,5 @@
 import { supabase } from "../utils/supabase"
-import { useSwal }  from "../composables/swal";
+import { useSwal } from "../composables/swal";
 
 export const useTasks = () => {
 
@@ -10,7 +10,7 @@ export const useTasks = () => {
     // const supabaseUrl = 'your-supabase-url';
     // const supabaseKey = 'your-supabase-key';
     // const supabase = createClient(supabaseUrl, supabaseKey);
- 
+
     const addTask = async (data) => {
         const { data: insertedTask, error: insertError } = await supabase
             .from('tasks')
@@ -36,16 +36,16 @@ export const useTasks = () => {
         const { data: tasks, error } = await supabase
             .from('tasks')
             .select('*')
-            .order('created_at', { ascending: false }); 
-    
+            .order('created_at', { ascending: false });
+
         if (error) {
             console.error("Erreur lors de la récupération des tâches :", error.message);
             return [];
         }
-    
+
         return tasks || [];
     };
-    
+
 
 
     const deleteTask = async (taskId) => {
@@ -129,12 +129,27 @@ export const useTasks = () => {
         }
 
         try {
-            const templateParams = {
-                to_email: email,
-                task_id: taskId
-            };
+            const subject = 'Nouvelle Tâche Assignée';
+            const message = `
+              <p>Bonjour,</p>
+              <p>Une nouvelle tâche vous a été assignée. Voici les détails :</p>
+              <p><strong>Titre :</strong> ${updatedTask.title}</p>
+              <p><strong>Description :</strong> ${updatedTask.description}</p>
+              <p><strong>Priorité :</strong> ${updatedTask.priority}</p>
+              <p><strong>Statut :</strong> ${updatedTask.status}</p>
+              <p><strong>Assignée par :</strong> Administrateur</p>
+              <p>Veuillez vous connecter à votre compte pour voir plus de détails et commencer à travailler sur la tâche.</p>
+              <p>Cordialement,</p>
+            `;
 
-            await emailjs.send('your_service_id', 'your_template_id', templateParams, 'your_user_id');
+            const { error } = await supabase.auth.api.sendMagicLinkEmail(email, {
+                subject: subject,
+                html: message
+            });
+
+            if (error) {
+                console.error("Erreur lors de l'envoi de l'email :", error.message);
+            }
             useSwal("Succès", `La tâche a été assignée et l'email a été envoyé avec succès.`, "success").temporary();
         } catch (emailError) {
             console.error("Erreur lors de l'envoi de l'email :", emailError.message);

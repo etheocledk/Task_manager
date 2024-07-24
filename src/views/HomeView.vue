@@ -108,6 +108,8 @@
     </TaskDetail>
     <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask = "updateTaskRow"></UpdateTaskModal >
 
+      <!-- const assignTask = async (taskId, email) -->
+
   </div>
 </template>
 <script setup>
