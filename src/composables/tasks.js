@@ -1,15 +1,8 @@
 import { supabase } from "../utils/supabase"
 import { useSwal } from "../composables/swal";
+import emailjs from 'emailjs-com';
 
 export const useTasks = () => {
-
-    //     import emailjs from 'emailjs-com';
-    // import { createClient } from '@supabase/supabase-js';
-    // import useSwal from 'somewhere';
-
-    // const supabaseUrl = 'your-supabase-url';
-    // const supabaseKey = 'your-supabase-key';
-    // const supabase = createClient(supabaseUrl, supabaseKey);
 
     const addTask = async (data) => {
         const { data: insertedTask, error: insertError } = await supabase
@@ -112,6 +105,7 @@ export const useTasks = () => {
         return updatedTask;
     };
 
+
     const assignTask = async (taskId, email) => {
         const { data: updatedTask, error: updateError } = await supabase
             .from('tasks')
@@ -129,31 +123,27 @@ export const useTasks = () => {
         }
 
         try {
-            const subject = 'Nouvelle Tâche Assignée';
             const message = `
-              <p>Bonjour,</p>
-              <p>Une nouvelle tâche vous a été assignée. Voici les détails :</p>
-              <p><strong>Titre :</strong> ${updatedTask.title}</p>
-              <p><strong>Description :</strong> ${updatedTask.description}</p>
-              <p><strong>Priorité :</strong> ${updatedTask.priority}</p>
-              <p><strong>Statut :</strong> ${updatedTask.status}</p>
-              <p><strong>Assignée par :</strong> Administrateur</p>
-              <p>Veuillez vous connecter à votre compte pour voir plus de détails et commencer à travailler sur la tâche.</p>
-              <p>Cordialement,</p>
-            `;
+                  Bonjour,
+                  Une nouvelle tâche vous a été assignée. Voici les détails :
+                  Titre : ${updatedTask[0].title}
+                  Description : ${updatedTask[0].description}
+                  Priorité : ${updatedTask[0].priority}
+                  Statut : ${updatedTask[0].status}
+                  Assignée par : Administrateur
+                `;
+            const response = await emailjs.send('service_qtk8agz', 'template_lce8uim', {
+                email: 'Recipient Name',
+                from_name: 'Your Name',
+                to_email: email,
+                message: message,
+                reply_to: 'your-email@example.com'
+            }, '-iI2FlNPB-PC7nx7I');
 
-            const { error } = await supabase.auth.api.sendMagicLinkEmail(email, {
-                subject: subject,
-                html: message
-            });
-
-            if (error) {
-                console.error("Erreur lors de l'envoi de l'email :", error.message);
-            }
             useSwal("Succès", `La tâche a été assignée et l'email a été envoyé avec succès.`, "success").temporary();
         } catch (emailError) {
             console.error("Erreur lors de l'envoi de l'email :", emailError.message);
-            useSwal("Erreur", `La tâche a été assignée mais l'email n'a pas pu être envoyé.`, "error").temporary();
+            useSwal("Erreur", `La tâche a été assignée mais l'email n'a pas pu être envoyé.`, "error");
         }
 
         return updatedTask;

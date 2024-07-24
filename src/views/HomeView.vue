@@ -48,7 +48,7 @@
                         {{ item.priority === 'high' ? 'Élevé' : item.priority === 'medium' ? 'Moyen' : 'Bas' }}
                       </span>
                     </td>
-                    <td>{{ item.status || 'undefined' }}</td>
+                    <td>{{ formatStatus(item.status) }} </td>
                     <td>
                       <ul class="list-inline mb-0">
                         <li class="list-inline-item">
@@ -60,14 +60,16 @@
                           <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="remove(item.id)"
                             title="Supprimer" class="px-2 text-danger"><i class="bx bx-trash-alt font-size-18"></i></a>
                         </li>
-                        <li class="list-inline-item dropdown">
-                          <a class="text-muted dropdown-toggle font-size-18 px-2" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false"><i
-                              class="bx bx-dots-vertical-rounded"></i></a>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" @click="openDetailModal(item.id)">Détails</a></li>
-                            <li><a class="dropdown-item" href="#">Assigner</a></li>
-                          </ul>
+                        <li class="list-inline-item">
+                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="openDetailModal(item.id)"
+                            title="Detail" class="px-2 text-danger"> <i class="bx bx-detail font-size-18 me-2"
+                              style="color: #17a2b8;"></i></a>
+                        </li>
+                        <li class="list-inline-item">
+                          <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" @click="openAssignModal(item.id)"
+                            title="Assigner" class="px-2 text-danger"><i class="bx bx-user-plus font-size-18 me-2"
+                              style="color: #28a745;"></i>
+                          </a>
                         </li>
                       </ul>
                     </td>
@@ -106,10 +108,8 @@
     </div>
     <TaskDetail :showOffcanvas="showOffcanvas" :taskChooseId="taskChooseId" @showOffcanvas="getShowOffcanvasStatus">
     </TaskDetail>
-    <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask = "updateTaskRow"></UpdateTaskModal >
-
-      <!-- const assignTask = async (taskId, email) -->
-
+    <UpdateTaskModal :mode="mode" :taskChooseId="taskChooseId" @newTask="updateTaskRow"></UpdateTaskModal>
+    <TaskAssigner :mode="modeAssignModal" :taskChooseId="taskChooseId"></TaskAssigner>
   </div>
 </template>
 <script setup>
@@ -117,6 +117,7 @@ import HeaderVue from "../components/Header.vue";
 import AddTaskModal from "@/components/AddTaskModal.vue";
 import TaskDetail from "@/components/TaskDetail.vue";
 import UpdateTaskModal from "@/components/UpdateTaskModal.vue";
+import TaskAssigner from "@/components/TaskAssigner.vue";
 import { useTasks } from "../composables/tasks";
 import { useSwal } from "../composables/swal";
 import moment from "moment";
@@ -129,6 +130,7 @@ const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const showOffcanvas = ref(false);
 const taskChooseId = ref();
+const modeAssignModal = ref();
 const mode = ref(false);
 
 // Nombre total de tâches
@@ -174,6 +176,19 @@ const remove = async (id) => {
   }
 }
 
+const formatStatus = (status) => {
+    switch (status) {
+        case 'to_do':
+            return 'A faire';
+        case 'in_progress':
+            return 'En cours';
+        case 'completed':
+            return 'Terminé';
+        default:
+            return 'Non défini';
+    }
+};
+
 // Fonction pour gérer l'ajout d'une nouvelle tâche
 const handleNewTask = (value) => {
   tasksList.value.unshift(value[0]);
@@ -196,6 +211,11 @@ async function openDetailModal(id) {
 
 async function openUpdateModal(id) {
   mode.value = true;
+  taskChooseId.value = id;
+}
+
+async function openAssignModal(id) {
+  modeAssignModal.value = true;
   taskChooseId.value = id;
 }
 

@@ -68,7 +68,7 @@
 <script setup>
 import { useTasks } from "../composables/tasks";
 import { useSwal } from "../composables/swal";
-import { defineEmits, ref, watch } from "vue";
+import { ref, watch } from "vue";
 const props = defineProps(["mode", "taskChooseId"]);
 const { getSingleTask, updateTask } = useTasks();
 const task = ref([]);

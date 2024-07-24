@@ -23,7 +23,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="taskStatus" class="form-label">Status :</label>
-                    <input id="taskStatus" type="text" class="form-control" :value="task.status || 'undefined'"
+                    <input id="taskStatus" type="text" class="form-control" :value="formatStatus(task.status)"
                         disabled />
                 </div>
                 <div class="mb-3">
@@ -41,7 +41,7 @@
     </div>
 </template>
 <script setup>
-import { defineEmits, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useTasks } from "../composables/tasks";
 import moment from 'moment';
 const props = defineProps(["showOffcanvas", "taskChooseId"]);
@@ -66,6 +66,19 @@ const formatPriority = (priority) => {
             return 'Moyen';
         case 'low':
             return 'Bas';
+        default:
+            return 'Non défini';
+    }
+};
+
+const formatStatus = (status) => {
+    switch (status) {
+        case 'to_do':
+            return 'A faire';
+        case 'in_progress':
+            return 'En cours';
+        case 'completed':
+            return 'Terminé';
         default:
             return 'Non défini';
     }
