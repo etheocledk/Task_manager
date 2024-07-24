@@ -1,6 +1,7 @@
 import { supabase } from "../utils/supabase"
+import { useSwal }  from "../composables/swal";
 
-export const useReports = () => {
+export const useTasks = () => {
 
     //     import emailjs from 'emailjs-com';
     // import { createClient } from '@supabase/supabase-js';
@@ -9,14 +10,14 @@ export const useReports = () => {
     // const supabaseUrl = 'your-supabase-url';
     // const supabaseKey = 'your-supabase-key';
     // const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const addTask = async (title, description, priority) => {
+ 
+    const addTask = async (data) => {
         const { data: insertedTask, error: insertError } = await supabase
             .from('tasks')
             .insert([{
-                title: title,
-                description: description,
-                priority: priority
+                title: data.value.title,
+                description: data.value.description,
+                priority: data.value.priority
             }])
             .select('*');
 
@@ -34,15 +35,17 @@ export const useReports = () => {
     const getTasks = async () => {
         const { data: tasks, error } = await supabase
             .from('tasks')
-            .select('*');
-
+            .select('*')
+            .order('created_at', { ascending: false }); 
+    
         if (error) {
             console.error("Erreur lors de la récupération des tâches :", error.message);
             return [];
         }
-
+    
         return tasks || [];
     };
+    
 
 
     const deleteTask = async (taskId) => {
@@ -137,7 +140,6 @@ export const useReports = () => {
 
         return updatedTask;
     };
-
 
     return {
         addTask,
